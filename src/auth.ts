@@ -3,6 +3,8 @@ import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
 import Credentials from "next-auth/providers/credentials"
 import email from "next-auth/providers/email"
+import User from "./models/userModel"
+import {compare} from 'bcryptjs'
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Google({
@@ -21,21 +23,32 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 type: "password"
             }
         },
-        authorize: async({email, password})=>{
+        authorize: async(credentials)=>{
         
-            console.log(email,password);
-            if(typeof email !== 'string')
+            const email = credentials.email as string;
+            const password = credentials.password as string;
+
+            if(!email || !password)
                 throw new CredentialsSignin({
-                    cause: "Email is not valid",
+                    cause: "Please provide both email an password",
             });
+            //Connection with database here
+            const user = await User.findOne({email}).select("+password");
+            if(!user) throw new CredentialsSignin({
+                cause: "User not found",
+            });
+            if(!user.password) throw new CredentialsSignin({
+                cause: "Password not set",
+            }); 
+            const isMatch = await compare(password, user.password);
 
-            const user = {email: 'sdsd', id: 'dfd'};
-
-            if(password !== 'passcode')
+            if(!isMatch)
                 throw new CredentialsSignin({
                     cause: "Password is not valid",
             });
-            else return user;
+            return {name: user.name, email: user.email, id: user._id};
+            
+            
         }
     })
   ],
