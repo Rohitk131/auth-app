@@ -1,10 +1,7 @@
-import Image from "next/image";
-
 export default function Home() {
   return (
-    <div>
-      <h1 className="text-6xl font-bold text-blue-500 text-center p-40">Next Auth</h1>
-      
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }} className="bg-[#1E161E]">
+      <img src="https://i.ibb.co/L0h4gcF/Next-Auth.png" alt="Vercel Logo" style={{ maxHeight: '100%', maxWidth: '100%' }} />
     </div>
   );
 }
