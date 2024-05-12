@@ -5,6 +5,7 @@ import Credentials from "next-auth/providers/credentials"
 import email from "next-auth/providers/email"
 import User from "./models/userModel"
 import {compare} from 'bcryptjs'
+import { connect } from "http2"
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Google({
@@ -33,6 +34,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     cause: "Please provide both email an password",
             });
             //Connection with database here
+
+            await connectToDatabase();
             const user = await User.findOne({email}).select("+password");
             if(!user) throw new CredentialsSignin({
                 cause: "User not found",
